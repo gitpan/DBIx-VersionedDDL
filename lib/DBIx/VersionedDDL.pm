@@ -23,7 +23,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ encountered.
 
 The database handle will autocommit any updates to the schema
 tables. If an active handle is supplied, it should not be shared
-with any external transactions. The best apporach is to clone
+with any external transactions. The best approach is to clone
 an active handle before passing it to the utility:
 
     my $dbh = DBI->connect('DBI:Oracle:orcl', 'scott', 'tiger');
@@ -342,7 +342,7 @@ sub _update_version {
 
 =head1 SCHEMA DEFINITION
 
-The defintion of a schema can differ between database products. For
+The definition of a schema can differ between database products. For
 Oracle a schema is a:
 
     collection of database objects, including logical structures
@@ -351,7 +351,7 @@ Oracle a schema is a:
     the user who controls it.
     
 In this context, the user parameter should be the owner of the schema.
-With other databases, such as MySQL, the schema is analagous to a
+With other databases, such as MySQL, the schema is analogous to a
 database. The user parameter should be an account that has full
 privileges to the database  so that it can apply the DDL and update
 the schema_version table.
@@ -370,7 +370,7 @@ For more information:
 
 =head1 AUTHOR
 
-Dan Horne, C<< <dan.horne at cpan.org> >>
+Dan Horne, C<< <dhorne at cpan.org> >>
 
 =head1 BUGS
 

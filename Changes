@@ -2,4 +2,5 @@ Revision history for DBIx-VersionedDDL
 
 0.01    20 October 2009
         First version, released on an unsuspecting world.
-
+0.02    20 October 2009
+        Fixed documentation typos.
