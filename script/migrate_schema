@@ -63,7 +63,7 @@ module type
     
 =head1 AUTHOR
 
-Dan Horne, C<< <dan.horne at cpan.org> >>
+Dan Horne, C<< <dhorne at cpan.org> >>
     
 =head1 COPYRIGHT & LICENSE
 
