@@ -6,3 +6,6 @@ Revision history for DBIx-VersionedDDL
         Fixed documentation typos.
 0.03    20 October 2009
         Yikes. More typo fixes.
+0.04    21 October 2009
+        Build assumed existence of data directory, which is not part of distro.
+        This is now created and removed as part of the tests,

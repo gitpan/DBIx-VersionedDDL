@@ -7,6 +7,9 @@ use Data::Dumper;
 use DBI;
 use DBIx::VersionedDDL;
 
+unless (-d "$Bin/data") {
+    mkdir "$Bin/data" || die $!;
+}
 my $db_file = "$Bin/data/dbiv.db";
 
 unlink $db_file if -f $db_file;
@@ -90,3 +93,4 @@ $version = $sv->dbh->selectrow_hashref('select * from schema_version');
 is_deeply($version, $version_rec, 'Using dsn instead of a db handle');
 
 unlink $db_file;
+rmdir "$Bin/data";
