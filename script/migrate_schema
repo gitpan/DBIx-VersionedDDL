@@ -1,0 +1,76 @@
+#!/usr/bin/perl -w
+use strict;
+use DBIx::VersionedDDL;
+use Getopt::Long;
+use Pod::Usage;
+use Carp;
+
+my ($user, $pass, $dsn, $ddl_dir, $version, $exit_code, $args);
+my $man  = 0;
+my $help = 0;
+
+my $result = GetOptions(
+    "user=s"    => \$user,
+    "pass=s"    => \$pass,
+    "dsn=s"     => \$dsn,
+    "ddl_dir=s" => \$ddl_dir,
+    "version=s" => \$version,
+    'help|?'    => \$help,
+    'man'       => \$man,
+);
+
+GetOptions('help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+$args->{user} = $user if $user;
+$args->{pass} = $user if $pass;
+$args->{dsn}     = $dsn     || croak "No DSN";
+$args->{ddl_dir} = $ddl_dir || croak "No DDL directory";
+$args->{version} = $version || croak "No args provided";
+
+my $sv = DBIx::VersionedDDL->new($args);
+
+my $ret = $sv->migrate($version);
+
+$exit_code = ($ret == 0) ? 1 : 0;
+exit $exit_code;
+
+__END__
+
+=head1 NAME
+
+migrate_schema - Utility to migrate a schema from one version to another
+
+=head1 SYNOPSIS
+
+migrate_schema [options]
+
+    Options
+    -user    The user who has access to the schema table
+    -pass    The user's password
+    -dsn     The perl dsn. For example:
+             * DBI:Oracle:orcl
+             * DBI:mysql:test
+    -ddl_dir The directory containing the migration scripts
+    -man     The full documentation
+    -help    Brief help message
+    
+This script invokes DBIx::VersionedDDL. For more information on this
+module type
+
+    perldoc DBIx::VersionedDDL
+    
+=head1 AUTHOR
+
+Dan Horne, C<< <dan.horne at cpan.org> >>
+    
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009 Dan Horne.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+             
