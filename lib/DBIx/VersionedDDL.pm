@@ -19,11 +19,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05    
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -115,8 +115,8 @@ The schema_version table has three columns:
     +---------+---------------------------------------------------+
     | version | The current version of the schema                 |
     | status  | The status of the script that updated the version |
-    |         | record. It will be either 'success' or 'failure'  |
-    | message | And message generated when an error occurs        |
+    |         | record. It will be either 'success' or 'error'    |
+    | message | Any message generated when an error occurs        |
     +---------+---------------------------------------------------+
 
 =head1 METHODS
