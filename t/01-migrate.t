@@ -30,11 +30,11 @@ my $version_rec = {
 my $version = $dbh->selectrow_hashref('select * from schema_version');
 is_deeply($version, $version_rec, 'Upgrade');
 
-my $sth = $dbh->table_info(undef, '%', 'dbiv_test', 'TABLE');
-my $tab_details = $sth->fetchrow_hashref;
+my $sth = $dbh->table_info(undef, '%', '%', 'TABLE');
+my $tab_details = $sth->fetchall_hashref('TABLE_NAME');
 $sth->finish;
 
-is($tab_details->{TABLE_NAME}, 'dbiv_test', 'Table created');
+is_deeply([sort(keys %$tab_details)], [qw/comments_test dbiv_test schema_version/], 'Tables created');
 
 $sv->migrate(0);
 

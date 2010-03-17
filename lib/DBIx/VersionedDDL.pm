@@ -19,11 +19,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.05    
+Version 0.06    
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -296,8 +296,19 @@ sub _run {
         local $/;
         $ddl = <$fh>;
         close $fh;
+        
         $ddl =~ s/;\s+/;/g;
-        $ddl =~ s/--.*$/ /g;
+        
+        # Naive regexes to remove comments
+        $ddl =~ s/(?:--|#).*$/ /mg;
+        
+        # C-style comments stolen from File::Comments::Plugin::C
+        $ddl =~ s#^\s*/\*.*?\*/(\s*\n)?|
+              /\*.*?\*/|
+              ^\s*//.*?\n|
+              \s*//.*?$
+             ##mxsg;
+        
         $ddl =~ s/\r/ /mxg;
         $ddl =~ s/\n/ /mxg;
         $ddl =~ s/\s+/ /mxg;
