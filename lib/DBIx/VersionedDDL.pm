@@ -24,7 +24,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ to the maximum version specified by upgrade(n).sql:
 sub migrate {
     my $self              = shift;
     my $requested_version = shift;
-    
+
     unless (defined $requested_version) {
         $requested_version = $self->_get_max_version;
     }
@@ -204,9 +204,9 @@ sub migrate {
         $version-- if $prefix eq 'downgrade';
         $self->_update_version($version, 'error',
             basename($script) . ': ' . $error);
-        return 0; 
+        return 0;
     }
-    
+
     return 1;
 }
 
@@ -227,10 +227,10 @@ sub BUILD {
 
     unless ($self->dbh) {
         croak "No database connect info" unless $self->dsn;
-        
-        my $dbh = DBI->connect(
-                $self->dsn, $self->user, $self->pass, {RaiseError => 1}
-            ) || croak DBI::errstr;
+
+        my $dbh =
+          DBI->connect($self->dsn, $self->user, $self->pass, {RaiseError => 1})
+          || croak DBI::errstr;
 
         $self->dbh($dbh);
     }
@@ -264,7 +264,15 @@ sub _version_table_exists {
     my $sth = $self->dbh->table_info(undef, $schema, $table, 'TABLE');
 
     while (my $table_info = $sth->fetchrow_hashref()) {
-        if ($table_info->{TABLE_NAME} eq $table) {
+        # Depending on whether FetchHashKeyName has been set to lower or
+        # upper case, we should check both versions
+
+        my $table_col =
+          ($self->dbh->{FetchHashKeyName} eq 'NAME_lc')
+          ? 'table_name'
+          : 'TABLE_NAME';
+          
+        if ($table_info->{$table_col} eq $table) {
             return 1;
         }
     }
@@ -319,26 +327,27 @@ sub _run {
         local $/;
         $ddl = <$fh>;
         close $fh;
-        
+
         $ddl =~ s/;\s+/;/g;
-        
+
         # Naive regexes to remove comments
         $ddl =~ s/(?:--|#).*$/ /mg;
-        
+
         # C-style comments stolen from File::Comments::Plugin::C
         $ddl =~ s#^\s*/\*.*?\*/(\s*\n)?|
               /\*.*?\*/|
               ^\s*//.*?\n|
               \s*//.*?$
              ##mxsg;
-        
+
         $ddl =~ s/\r/ /mxg;
         $ddl =~ s/\n/ /mxg;
         $ddl =~ s/\s+/ /mxg;
     }
 
     # Now split each command based on a semi-colon
-    my $csv = Text::CSV->new({sep_char => $self->separator, allow_whitespace => 1});
+    my $csv =
+      Text::CSV->new({sep_char => $self->separator, allow_whitespace => 1});
     my @statements;
     if ($csv->parse($ddl)) {
         @statements = $csv->fields;

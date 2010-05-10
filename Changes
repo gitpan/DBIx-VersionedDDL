@@ -19,3 +19,5 @@ Revision history for DBIx-VersionedDDL
         * Add user-defined statement separator.
         * If no version is provided, the schema will be upgraded to the latest
           version in the ddl directory
+0.08    The check regarding whether a table exists now handles db handle
+        FetchHashKeyName = NAME_lc
