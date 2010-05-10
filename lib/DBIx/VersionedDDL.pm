@@ -12,6 +12,7 @@ has 'dsn'     => (is => 'ro', isa => 'Str',     required => 0);
 has 'ddl_dir' => (is => 'ro', isa => 'Str',     required => 1);
 has 'debug'   => (is => 'ro', isa => 'Str',     required => 0, default => 0);
 has 'dbh'     => (is => 'rw', isa => 'DBI::db', required => 0);
+has 'separator' => (is => 'rw', isa => 'Str', required => 0, default => ';');
 
 =head1 NAME
 
@@ -23,7 +24,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -126,25 +127,36 @@ The schema_version table has three columns:
 The following attributes can be supplied at creation time by passing
 values to the new method.
 
-   * user    - The database user account
-   * pass    - The user password.
-   * dsn     - The database DSN
-   * ddl_dir - The directory that hosts the migration scripts
-   * debug   - Whether debug messages are shown
-   * dbh     - An active database handle. This can be used as
-               an alternative to the user, pass and dsn parameters
+   * user      - The database user account
+   * pass      - The user password.
+   * dsn       - The database DSN
+   * ddl_dir   - The directory that hosts the migration scripts
+   * debug     - Whether debug messages are shown
+   * dbh       - An active database handle. This can be used as
+                 an alternative to the user, pass and dsn parameters
+   * separator - Specify an alternative to the semi-colon to delimit
+                 SQL statements
 
 =head2 migrate
 
 Migrate from the current schema version to the specified one:
 
     $sv->migrate(7);
+    
+If a version is not provided, the schema will be upgraded (or downgraded!)
+to the maximum version specified by upgrade(n).sql:
+
+    $sv->migrate
 
 =cut
 
 sub migrate {
     my $self              = shift;
     my $requested_version = shift;
+    
+    unless (defined $requested_version) {
+        $requested_version = $self->_get_max_version;
+    }
 
     croak 'No version provided' unless $requested_version =~ /^\d+$/;
 
@@ -198,6 +210,17 @@ sub migrate {
     return 1;
 }
 
+sub _get_max_version {
+    my $self    = shift;
+    my $version = 0;
+    foreach my $file (glob($self->ddl_dir . "/upgrade*.sql")) {
+        if ($file =~ /upgrade(\d+).sql/) {
+            $version = $1 if $1 > $version;
+        }
+    }
+    return $version;
+}
+
 # Set up the application
 sub BUILD {
     my $self = shift;
@@ -231,7 +254,7 @@ sub _version_table_exists {
     # use the case specified at table creation time
     if ($driver eq 'Oracle') {
         $table  = uc $table;
-        $schema = uc $self->user;
+        $schema = uc $self->dbh->get_info($GetInfoType{SQL_USER_NAME});
     } elsif ($driver eq 'mysql') {
         $schema =
           (split /:/, $self->dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}))
@@ -262,7 +285,7 @@ sub _create_version_table {
     my $sql = q{
         create table schema_version(
             version integer,
-            message varchar(2000),
+            message varchar(4000),
             status  varchar(8)
         )
     };
@@ -315,7 +338,7 @@ sub _run {
     }
 
     # Now split each command based on a semi-colon
-    my $csv = Text::CSV->new({sep_char => ';', allow_whitespace => 1});
+    my $csv = Text::CSV->new({sep_char => $self->separator, allow_whitespace => 1});
     my @statements;
     if ($csv->parse($ddl)) {
         @statements = $csv->fields;
@@ -420,11 +443,6 @@ L<http://cpanratings.perl.org/d/DBIx-VersionedDDL>
 L<http://search.cpan.org/dist/DBIx-VersionedDDL/>
 
 =back
-
-=head1 WARNING
-
-This is ALPHA software. Use at your own risk. If you do discover a
-problem, please log a BUG
 
 =head1 COPYRIGHT & LICENSE
 

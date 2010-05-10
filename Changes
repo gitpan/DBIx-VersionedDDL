@@ -15,3 +15,7 @@ Revision history for DBIx-VersionedDDL
         RT #55550, fix coment parsing (succssive lines having -- comments)
           Reported by by Alan Snelson
         Added # and C-style comments.
+0.07    * Determine the Oracle Schema by retrieving ANSI Constant SQL_USER_NAME.
+        * Add user-defined statement separator.
+        * If no version is provided, the schema will be upgraded to the latest
+          version in the ddl directory

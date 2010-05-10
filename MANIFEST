@@ -7,10 +7,14 @@ README
 script/migrate_schema
 t/00-load.t
 t/01-migrate.t
+t/02-migrate_script.t
 t/boilerplate.t
 t/ddl_dir/downgrade1.sql
 t/ddl_dir/upgrade1.sql
 t/ddl_dir/upgrade2.sql
+t/ddl_dir_slash/upgrade1.sql
+t/ddl_dir_slash/upgrade2.sql
+t/ddl_dir_slash/upgrade3.sql
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module meta-data (added by MakeMaker)

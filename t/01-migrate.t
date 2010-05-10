@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use FindBin qw($Bin);
-use Test::More tests => 10;
+use Test::More tests => 12;
 use Data::Dumper;
 use DBI;
 use DBIx::VersionedDDL;
@@ -34,7 +34,11 @@ my $sth = $dbh->table_info(undef, '%', '%', 'TABLE');
 my $tab_details = $sth->fetchall_hashref('TABLE_NAME');
 $sth->finish;
 
-is_deeply([sort(keys %$tab_details)], [qw/comments_test dbiv_test schema_version/], 'Tables created');
+is_deeply(
+    [sort(keys %$tab_details)],
+    [qw/comments_test dbiv_test schema_version/],
+    'Tables created'
+);
 
 $sv->migrate(0);
 
@@ -93,4 +97,55 @@ $version = $sv->dbh->selectrow_hashref('select * from schema_version');
 is_deeply($version, $version_rec, 'Using dsn instead of a db handle');
 
 unlink $db_file;
+
+$dbh = DBI->connect("dbi:SQLite:$db_file", "", "");
+
+$sv = DBIx::VersionedDDL->new(
+    {
+        dbh       => $dbh,
+        ddl_dir   => "$Bin/ddl_dir_slash",
+        debug     => 0,
+        separator => '/'
+    }
+);
+
+$sv->migrate(2);
+
+$version_rec = {
+    'status'  => 'success',
+    'version' => '2',
+    'message' => undef,
+};
+
+$version = $dbh->selectrow_hashref('select * from schema_version');
+is_deeply($version, $version_rec, 'Slash delimiter');
+$dbh->disconnect;
+
+unlink $db_file;
+
+$dbh = DBI->connect("dbi:SQLite:$db_file", "", "");
+
+$sv = DBIx::VersionedDDL->new(
+    {
+        dbh       => $dbh,
+        ddl_dir   => "$Bin/ddl_dir_slash",
+        debug     => 0,
+        separator => '/'
+    }
+);
+
+$sv->migrate();
+
+$version_rec = {
+    'status'  => 'success',
+    'version' => '3',
+    'message' => undef,
+};
+
+$version = $dbh->selectrow_hashref('select * from schema_version');
+is_deeply($version, $version_rec, 'Migrate to max');
+$dbh->disconnect;
+
+unlink $db_file;
+
 rmdir "$Bin/data";
