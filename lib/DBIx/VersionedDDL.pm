@@ -24,7 +24,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ sub migrate {
     croak "Invalid version" unless ($requested_version =~ /^\d+$/);
     croak "Invalid DDL directory" unless (-d $self->ddl_dir);
 
-    return if $requested_version == $current_version;
+    return 1 if $requested_version == $current_version;
 
     my ($version, $script, $stop_version, $prefix);
     if ($requested_version > $current_version) {
@@ -455,7 +455,7 @@ L<http://search.cpan.org/dist/DBIx-VersionedDDL/>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Dan Horne.
+Copyright 2009-2010 Dan Horne.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

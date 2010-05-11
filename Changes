@@ -21,3 +21,4 @@ Revision history for DBIx-VersionedDDL
           version in the ddl directory
 0.08    The check regarding whether a table exists now handles db handle
         FetchHashKeyName = NAME_lc
+0.09    Returns 1 if the schema is already at the requested version
