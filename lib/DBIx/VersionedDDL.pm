@@ -24,7 +24,7 @@ Version 0.06
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -247,12 +247,12 @@ sub BUILD {
 sub _version_table_exists {
     my $self   = shift;
     my $table  = 'schema_version';
-    my $driver = $self->_get_driver;
+    my $driver = lc $self->_get_driver;
     my $schema;
 
     # Oracle stores its tables in upper case while other dbs such as MySQL
     # use the case specified at table creation time
-    if ($driver eq 'Oracle') {
+    if ($driver eq 'oracle') {
         $table  = uc $table;
         $schema = uc $self->dbh->get_info($GetInfoType{SQL_USER_NAME});
     } elsif ($driver eq 'mysql') {
@@ -268,7 +268,7 @@ sub _version_table_exists {
         # upper case, we should check both versions
 
         my $table_col =
-          ($self->dbh->{FetchHashKeyName} eq 'NAME_lc')
+          (defined $table_info->{table_name})
           ? 'table_name'
           : 'TABLE_NAME';
           
