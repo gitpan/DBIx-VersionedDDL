@@ -20,11 +20,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.06    
+Version 0.11    
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 

@@ -15,11 +15,17 @@ Revision history for DBIx-VersionedDDL
         RT #55550, fix coment parsing (succssive lines having -- comments)
           Reported by by Alan Snelson
         Added # and C-style comments.
-0.07    * Determine the Oracle Schema by retrieving ANSI Constant SQL_USER_NAME.
+0.07    10 May 2010
+        * Determine the Oracle Schema by retrieving ANSI Constant SQL_USER_NAME.
         * Add user-defined statement separator.
         * If no version is provided, the schema will be upgraded to the latest
           version in the ddl directory
-0.08    The check regarding whether a table exists now handles db handle
+0.08    10 May 2010
+        The check regarding whether a table exists now handles db handle
         FetchHashKeyName = NAME_lc
-0.09    Returns 1 if the schema is already at the requested version
-0.10    Driver name now in lower case
+0.09    11 May 2010
+        Returns 1 if the schema is already at the requested version
+0.10    13 May 2010
+        Driver name now in lower case
+0.11    28 May 2010
+        RT #57342 - Parse DDL that contains double quotes
