@@ -29,3 +29,5 @@ Revision history for DBIx-VersionedDDL
         Driver name now in lower case
 0.11    28 May 2010
         RT #57342 - Parse DDL that contains double quotes
+0.12    30 May 2010
+        Whoops RT #57342 changes were missing

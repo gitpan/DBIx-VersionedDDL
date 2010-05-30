@@ -20,11 +20,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.11    
+Version 0.12    
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -271,7 +271,7 @@ sub _version_table_exists {
           (defined $table_info->{table_name})
           ? 'table_name'
           : 'TABLE_NAME';
-          
+
         if ($table_info->{$table_col} eq $table) {
             return 1;
         }
@@ -346,8 +346,13 @@ sub _run {
     }
 
     # Now split each command based on a semi-colon
-    my $csv =
-      Text::CSV->new({sep_char => $self->separator, allow_whitespace => 1});
+    my $csv = Text::CSV->new(
+        {
+            sep_char           => $self->separator,
+            allow_whitespace   => 1,
+            allow_loose_quotes => 1
+        }
+    );
     my @statements;
     if ($csv->parse($ddl)) {
         @statements = $csv->fields;
