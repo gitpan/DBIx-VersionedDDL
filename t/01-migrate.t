@@ -109,6 +109,8 @@ $sv = DBIx::VersionedDDL->new(
     }
 );
 
+$sv->separator('/');
+
 $sv->migrate(2);
 
 $version_rec = {
@@ -133,6 +135,8 @@ $sv = DBIx::VersionedDDL->new(
         separator => '/'
     }
 );
+
+$sv->separator('/');
 
 $sv->migrate();
 

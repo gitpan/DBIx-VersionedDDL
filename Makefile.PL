@@ -19,6 +19,8 @@ WriteMakefile(
         'Text::CSV'    => 0,
         'DBD::SQLite'  => 0,
         'Pod::Usage'   => 0,
+        'MooseX::Attribute::ENV' => 0,
+        'MooseX::Object::Pluggable' => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'DBIx-VersionedDDL-*'},

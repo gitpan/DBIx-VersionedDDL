@@ -1,6 +1,7 @@
 Changes
 ignore.txt
 lib/DBIx/VersionedDDL.pm
+lib/DBIx/VersionedDDL/Plugin/DefaultScriptProcessor.pm
 Makefile.PL
 MANIFEST
 README

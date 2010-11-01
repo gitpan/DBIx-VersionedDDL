@@ -1,10 +1,12 @@
 package DBIx::VersionedDDL;
 use Moose;
+use MooseX::Attribute::ENV;
 use DBI;
 use DBI::Const::GetInfoType;
 use Carp;
-use Text::CSV;
 use File::Basename;
+
+with 'MooseX::Object::Pluggable';
 
 has 'user'    => (is => 'ro', isa => 'Str',     required => 0);
 has 'pass'    => (is => 'ro', isa => 'Str',     required => 0);
@@ -12,7 +14,15 @@ has 'dsn'     => (is => 'ro', isa => 'Str',     required => 0);
 has 'ddl_dir' => (is => 'ro', isa => 'Str',     required => 1);
 has 'debug'   => (is => 'ro', isa => 'Str',     required => 0, default => 0);
 has 'dbh'     => (is => 'rw', isa => 'DBI::db', required => 0);
-has 'separator' => (is => 'rw', isa => 'Str', required => 0, default => ';');
+
+has 'script_processor' => (
+    is                 => 'rw',
+    isa                => 'Str',
+    required           => 1,
+    traits             => ['ENV'],
+    env_package_prefix => 1,
+    default            => 'DefaultScriptProcessor',
+);
 
 =head1 NAME
 
@@ -20,11 +30,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.12    
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -83,7 +93,8 @@ If the administrator wishes to downgrade to version 6, the
 utility will run downgrade scripts 10-7.
 
 This utility expects SQL statements to be separated by
-semi-colons
+semi-colons by default, but an explicit separator can be
+specified.
 
 =head2 Leaving the schema in an indeterminate state.
 
@@ -127,15 +138,28 @@ The schema_version table has three columns:
 The following attributes can be supplied at creation time by passing
 values to the new method.
 
-   * user      - The database user account
-   * pass      - The user password.
-   * dsn       - The database DSN
-   * ddl_dir   - The directory that hosts the migration scripts
-   * debug     - Whether debug messages are shown
-   * dbh       - An active database handle. This can be used as
-                 an alternative to the user, pass and dsn parameters
-   * separator - Specify an alternative to the semi-colon to delimit
-                 SQL statements
+=over 4
+
+=item * B<user>. The database user account
+
+=item * B<pass>. The user password.
+
+=item * B<dsn>. The database DSN
+
+=item * B<ddl_dir>. The directory that hosts the migration scripts
+
+=item * B<debug>. Whether debug messages are shown
+
+=item * B<dbh>. An active database handle. This can be used as an alternative
+to the user, pass and dsn parameters
+
+=item * B<separator>. Specify an alternative to the semi-colon to delimit
+SQL statements
+
+=item * B<script_processor>. Optional. A plugin that processes the migration
+scripts. See L</PROVIDING YOUR OWN PROCESSOR VIA A PLUGIN> 
+
+=back
 
 =head2 migrate
 
@@ -241,6 +265,8 @@ sub BUILD {
     $self->dbh->{PrintError} = 0;
 
     croak "No DDL dir: " . $self->ddl_dir unless -d $self->ddl_dir;
+
+    $self->load_plugins($self->script_processor,);
 }
 
 # Determine whether or not the version table exists
@@ -318,47 +344,8 @@ sub _run {
     $script = $self->ddl_dir . '/' . $script;
     croak "Cannot find $script" unless -f $script;
 
-    my $ddl;
+    my @statements = $self->process_script($script);
 
-    # Slurp in the script - remove comments, extraneous spaces, and line
-    # separators
-    {
-        open(my $fh, '<', $script) || croak "Cannot parse $script: $!";
-        local $/;
-        $ddl = <$fh>;
-        close $fh;
-
-        $ddl =~ s/;\s+/;/g;
-
-        # Naive regexes to remove comments
-        $ddl =~ s/(?:--|#).*$/ /mg;
-
-        # C-style comments stolen from File::Comments::Plugin::C
-        $ddl =~ s#^\s*/\*.*?\*/(\s*\n)?|
-              /\*.*?\*/|
-              ^\s*//.*?\n|
-              \s*//.*?$
-             ##mxsg;
-
-        $ddl =~ s/\r/ /mxg;
-        $ddl =~ s/\n/ /mxg;
-        $ddl =~ s/\s+/ /mxg;
-    }
-
-    # Now split each command based on a semi-colon
-    my $csv = Text::CSV->new(
-        {
-            sep_char           => $self->separator,
-            allow_whitespace   => 1,
-            allow_loose_quotes => 1
-        }
-    );
-    my @statements;
-    if ($csv->parse($ddl)) {
-        @statements = $csv->fields;
-    }
-
-    my $counter = 1;
     foreach my $statement (@statements) {
         next if $statement =~ /^\s*$/;
         $self->dbh->do($statement);
@@ -387,6 +374,19 @@ sub _update_version {
 
     $self->dbh->do($sql, undef, $version, $status, $message);
 }
+
+=head1 PROVIDING YOUR OWN PROCESSOR VIA A PLUGIN
+
+You can supply your own functionality to parse migration scripts
+via a plugin. The plugin must contain a I<process_script> method
+that takes a script name as an argument and returns an array of
+SQL statements. The name of your plugin can either be set in the
+environment variable I<SCRIPT_PROCESSOR> or the I<script_processor>
+attribute as part of the constructor. If your plugin is called
+DBIx::VersionedDDL::Plugin::MyProcessor, then SCRIPT_PROCESSOR should
+be set to I<MyProcessor>.
+
+For an example, refer to the source of L<DBIx::VersionedDDL::Plugin::DefaultScriptProcessor>
 
 =head1 SCHEMA DEFINITION
 
@@ -419,6 +419,10 @@ For more information:
 =head1 AUTHOR
 
 Dan Horne, C<< <dhorne at cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+Plugin functionality added by Jiri Pavlovsky.
 
 =head1 BUGS
 

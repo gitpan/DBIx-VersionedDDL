@@ -31,3 +31,6 @@ Revision history for DBIx-VersionedDDL
         RT #57342 - Parse DDL that contains double quotes
 0.12    30 May 2010
         Whoops RT #57342 changes were missing
+0.13    29 Oct 2010
+        RT #62276 Provide a possibility for custom script processing via plugins.
+        Thanks to Jiri Pavlovsky

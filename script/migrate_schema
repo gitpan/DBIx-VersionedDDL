@@ -25,15 +25,15 @@ pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 $args->{user} = $user if $user;
-$args->{pass} = $user if $pass;
+$args->{pass} = $pass if $pass;
 $args->{dsn}     = $dsn     || croak "No DSN";
 $args->{ddl_dir} = $ddl_dir || croak "No DDL directory";
 $args->{version}   = $version   if defined $version; 
-$args->{separator} = $separator if $separator;
 
 my $ret;
 
 my $sv = DBIx::VersionedDDL->new($args);
+$sv->separator($separator) if $separator;
 
 if (defined $version) {
     $ret = $sv->migrate($version);
@@ -78,7 +78,7 @@ Dan Horne, C<< <dhorne at cpan.org> >>
     
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009 Dan Horne.
+Copyright 2009-2010 Dan Horne.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

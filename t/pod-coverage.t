@@ -17,4 +17,4 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     
 my @modules = all_modules();
 plan tests => scalar @modules;
-pod_coverage_ok($_, {also_private => [qr/^BUILD$/]}) for @modules;
+pod_coverage_ok($_, {also_private => [qr/^BUILD|process_script$/]}) for @modules;
