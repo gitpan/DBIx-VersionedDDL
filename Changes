@@ -34,3 +34,5 @@ Revision history for DBIx-VersionedDDL
 0.13    29 Oct 2010
         RT #62276 Provide a possibility for custom script processing via plugins.
         Thanks to Jiri Pavlovsky
+0.14    15 Nov 2010
+        Added File::Slurp as a pre-requisite in Makefile.PL
