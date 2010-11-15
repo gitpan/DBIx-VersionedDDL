@@ -19,7 +19,6 @@ WriteMakefile(
         'Text::CSV'    => 0,
         'DBD::SQLite'  => 0,
         'Pod::Usage'   => 0,
-        'File::Slurp'  => 0,
         'MooseX::Attribute::ENV' => 0,
         'MooseX::Object::Pluggable' => 0,
     },

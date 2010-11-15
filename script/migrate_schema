@@ -41,7 +41,13 @@ if (defined $version) {
     $ret = $sv->migrate();
 }
 
-$exit_code = ($ret == 0) ? 1 : 0;
+if ($ret == 0) {    
+    warn $sv->get_message;
+    $exit_code = 1;
+} else {
+    $exit_code = 0;
+}
+
 exit $exit_code;
 
 __END__

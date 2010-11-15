@@ -30,11 +30,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =head1 SYNOPSIS
 
@@ -157,7 +157,7 @@ to the user, pass and dsn parameters
 SQL statements
 
 =item * B<script_processor>. Optional. A plugin that processes the migration
-scripts. See L</PROVIDING YOUR OWN PROCESSOR VIA A PLUGIN> 
+scripts. See L</PROVIDING YOUR OWN PROCESSOR VIA A PLUGIN>
 
 =back
 
@@ -171,6 +171,10 @@ If a version is not provided, the schema will be upgraded (or downgraded!)
 to the maximum version specified by upgrade(n).sql:
 
     $sv->migrate
+    
+=head2 get_message
+
+Returns the message value in the schema_version table
 
 =cut
 
@@ -337,6 +341,14 @@ sub _get_current_version {
     return $version;
 }
 
+sub get_message {
+    my $self = shift;
+    my $sql  = q{select message from schema_version};
+
+    my ($message) = $self->dbh->selectrow_array($sql);
+    return $message;
+}
+
 # Run the specified SQL script
 sub _run {
     my $self = shift;
@@ -348,6 +360,7 @@ sub _run {
 
     foreach my $statement (@statements) {
         next if $statement =~ /^\s*$/;
+        next unless $statement;
         $self->dbh->do($statement);
     }
 }

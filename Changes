@@ -36,3 +36,6 @@ Revision history for DBIx-VersionedDDL
         Thanks to Jiri Pavlovsky
 0.14    15 Nov 2010
         Added File::Slurp as a pre-requisite in Makefile.PL
+0.15    16 Nov 2010
+        * Removed File::Slurp as a pre-req and returned to slurping "by hand"
+        * migrate_schema warns when error encontered

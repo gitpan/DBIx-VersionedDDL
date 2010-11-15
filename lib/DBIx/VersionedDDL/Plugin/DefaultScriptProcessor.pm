@@ -10,11 +10,7 @@ argument and returns a list of SQL statements.
 =cut
 
 use Moose::Role;
-
-use File::Slurp;
-
 use Carp;
-
 use Text::CSV;
 
 has 'separator' => (is => 'rw', isa => 'Str', required => 0, default => ';');
@@ -31,7 +27,10 @@ sub process_script {
 
     my ($self, $script) = @_;
 
-    my $ddl = read_file($script) || croak "Cannot parse $script: $!";
+    open(my $fh, '<', $script) || croak "Cannot parse $script: $!";
+    local $/;
+    my $ddl = <$fh>;
+    close $fh;
 
     $ddl =~ s/;\s+/;/g;
 
