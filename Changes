@@ -39,3 +39,5 @@ Revision history for DBIx-VersionedDDL
 0.15    16 Nov 2010
         * Removed File::Slurp as a pre-req and returned to slurping "by hand"
         * migrate_schema warns when error encontered
+0.16    16 Nov 2010
+        * Clarify the default processor separator

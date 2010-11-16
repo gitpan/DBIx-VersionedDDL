@@ -7,6 +7,15 @@ DBIx::VersionedDDL::Plugin::DefaultScriptProcessor - default plugin to process v
 Plugins are required to provide a method I<process_script> which takes path to version script as an
 argument and returns a list of SQL statements.
 
+=head2 ATTRIBUTES
+
+=over 4
+
+=item * separator. The charactor used to separate (delimit) SQL Statements
+in the file. Defaults to I<;> (a semi-colon)
+
+=back
+
 =cut
 
 use Moose::Role;
@@ -31,8 +40,9 @@ sub process_script {
     local $/;
     my $ddl = <$fh>;
     close $fh;
-
-    $ddl =~ s/;\s+/;/g;
+    
+    #my $separator = $self->separator;
+    #$ddl =~ s/$separator\s+/$separator/g;
 
     # Naive regexes to remove comments
     $ddl =~ s/(?:--|#).*$/ /mg;

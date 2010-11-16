@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               DBIx-VersionedDDL
-version:            0.15
+version:            0.16
 abstract:           Upgrade and downgrade database schemas to a specified version.
 author:
     - Dan Horne <dan.horne@redbone.co.nz>

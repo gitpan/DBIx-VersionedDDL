@@ -105,7 +105,6 @@ $sv = DBIx::VersionedDDL->new(
         dbh       => $dbh,
         ddl_dir   => "$Bin/ddl_dir_slash",
         debug     => 0,
-        separator => '/'
     }
 );
 
@@ -132,7 +131,6 @@ $sv = DBIx::VersionedDDL->new(
         dbh       => $dbh,
         ddl_dir   => "$Bin/ddl_dir_slash",
         debug     => 0,
-        separator => '/'
     }
 );
 

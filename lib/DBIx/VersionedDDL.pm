@@ -30,11 +30,11 @@ DBIx::VersionedDDL - Upgrade and downgrade database schemas to a specified versi
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -152,9 +152,6 @@ values to the new method.
 
 =item * B<dbh>. An active database handle. This can be used as an alternative
 to the user, pass and dsn parameters
-
-=item * B<separator>. Specify an alternative to the semi-colon to delimit
-SQL statements
 
 =item * B<script_processor>. Optional. A plugin that processes the migration
 scripts. See L</PROVIDING YOUR OWN PROCESSOR VIA A PLUGIN>
@@ -400,6 +397,19 @@ DBIx::VersionedDDL::Plugin::MyProcessor, then SCRIPT_PROCESSOR should
 be set to I<MyProcessor>.
 
 For an example, refer to the source of L<DBIx::VersionedDDL::Plugin::DefaultScriptProcessor>
+
+=head2 Populating plugin attributes
+
+Any attributes should be populated once the Versioned object is created:
+
+    my $sv = DBIx::VersionedDDL->new(
+        user => 'scott',
+        pass => 'tiger',
+        dsn  => 'DBI:Oracle:orcl',
+        ddl_dir => '/home/jdoe/ddl'
+    );
+    
+    $sv->separator('/');
 
 =head1 SCHEMA DEFINITION
 
