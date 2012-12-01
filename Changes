@@ -41,3 +41,5 @@ Revision history for DBIx-VersionedDDL
         * migrate_schema warns when error encontered
 0.16    16 Nov 2010
         * Clarify the default processor separator
+0.17    01 Dec 2012
+        * Determine Perl from $^X (RT #77461)

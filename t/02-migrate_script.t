@@ -13,7 +13,7 @@ unless (-d "$Bin/data") {
 my $db_file = "$Bin/data/dbiv.db";
 unlink $db_file if -f $db_file;
 
-system("perl $script --dsn=dbi:SQLite:$db_file --ddl_dir=$Bin/ddl_dir_slash --separator=/");
+system("$^X $script --dsn=dbi:SQLite:$db_file --ddl_dir=$Bin/ddl_dir_slash --separator=/");
 
 my $dbh = DBI->connect("dbi:SQLite:$db_file", "", "");
 
@@ -29,7 +29,7 @@ $dbh->disconnect;
 
 unlink $db_file;
 
-system("perl $script --dsn=dbi:SQLite:$db_file --ddl_dir=$Bin/ddl_dir_slash --separator=/ --version=2");
+system("$^X $script --dsn=dbi:SQLite:$db_file --ddl_dir=$Bin/ddl_dir_slash --separator=/ --version=2");
 
 $dbh = DBI->connect("dbi:SQLite:$db_file", "", "");
 
